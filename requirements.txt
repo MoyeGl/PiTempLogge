@@ -1,0 +1,6 @@
+flask
+matplotlib
+pylint
+pytest
+coverage
+python-dotenv
