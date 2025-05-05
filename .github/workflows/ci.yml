@@ -12,33 +12,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Check out your code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. Set up Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      # 3. Install dependencies + testing tools
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install coverage pytest pytest-cov pylint
 
+      # 4. Make your code importable
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV
 
+      # 5. Lint (will never fail the job, just reports)
       - name: Lint with pylint
-        run: pylint src || true
+        run: pylint src --exit-zero
 
-      - name: Run tests
-        run: pytest tests/
+      # 6. Run tests *and* generate coverage.xml in one go
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=xml
 
-      - name: Run coverage
-        run: |
-          coverage run -m pytest
-          coverage xml
-
+      # 7. Upload the coverage report artifact
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
